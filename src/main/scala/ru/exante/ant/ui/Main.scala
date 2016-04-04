@@ -16,14 +16,23 @@ object Main {
 
       override def run(): Unit = {
         val frame = new JFrame("Langton's ant")
-        frame.setPreferredSize(new Dimension(500, 400))
+        frame.setPreferredSize(new Dimension(700, 400))
         frame.setLayout(new GridBagLayout)
-        val gbc = new GridBagConstraints()
-        gbc.fill = GridBagConstraints.BOTH
-        gbc.weightx = 1
-        gbc.weighty = 1
+
         val lPanel = new LangthonsPanel
-        frame.add(lPanel, gbc)
+        val lPanelGbc = new GridBagConstraints()
+        lPanelGbc.fill = GridBagConstraints.BOTH
+        lPanelGbc.weightx = 1
+        lPanelGbc.weighty = 1
+        frame.add(lPanel, lPanelGbc)
+
+//        val rPanel = new ControlPanel
+//        rPanel.setPreferredSize(new Dimension(300, 400))
+//        rPanel.setMinimumSize(new Dimension(300, 400))
+//        val rPanelGbc = new GridBagConstraints()
+//        rPanelGbc.fill = GridBagConstraints.BOTH
+//        rPanelGbc.weighty = 1
+//        frame.add(rPanel, rPanelGbc)
 
         val systemActor = ActorSystem("Langthon-ant-system")
         val transitionsActor = systemActor.actorOf(Props(new TransitionActor(lPanel)), "transitions-actor")

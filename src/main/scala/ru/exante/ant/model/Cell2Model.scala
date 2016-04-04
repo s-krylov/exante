@@ -23,8 +23,6 @@ class Cell2Model {
     newState
   }
 
-  def getState(x: Int, y: Int):Int = getState(Cell2(x, y))
-
   def getState(cell: Cell2):Int = data.getOrElse(cell, 0)
 
   def getData = data

@@ -11,7 +11,7 @@ import ru.exante.ant.ui.CellInfoStore
 class TransitionActor(private val cellInfoStore: CellInfoStore) extends Actor {
 
 //  val directions = Array(Left(), Right())
-  val directions = Array(Left(), Left(), Right(), Left())
+  val directions = Array(Right(), Left(), Right(), Left(), Left())
 
   private val ant = new Ant(this)
 
@@ -19,7 +19,7 @@ class TransitionActor(private val cellInfoStore: CellInfoStore) extends Actor {
     case MakeNextStep() => launch()
   }
 
-  def launch(): Unit = {
+  private def launch(): Unit = {
 
     val next = directions(ant.currentCellState)
     if (!ant.turn.isDefinedAt(next)) {
