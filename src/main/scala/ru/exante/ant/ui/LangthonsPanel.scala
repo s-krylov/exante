@@ -5,6 +5,8 @@ import java.awt.{Rectangle, Color, Graphics, Dimension}
 import ru.exante.ant.model.{Cell2, Cell2Model}
 import javax.swing.JPanel
 
+import ru.exante.ant.ui.api.CellInfoStore
+
 
 class LangthonsPanel extends JPanel with CellInfoStore {
 
@@ -14,7 +16,7 @@ class LangthonsPanel extends JPanel with CellInfoStore {
   private var currentDimensionY = INITIAL_DIMENSION_Y
 
 //  private val colors = Array(Color.WHITE, Color.RED)
-  private val colors = Array(Color.WHITE, Color.RED, Color.GREEN, Color.BLUE, Color.BLACK)
+  var colors: Array[Color] = Array(Color.WHITE)
 
   private val model = new Cell2Model
 
@@ -55,15 +57,12 @@ class LangthonsPanel extends JPanel with CellInfoStore {
       currentDimensionX *= SCALE_STEP
       currentDimensionY *= SCALE_STEP
     }
-    needScale
   }
 
 
-  override def paint(g: Graphics): Unit = {
-    val dim = getSize()
-    g.clearRect(0, 0, dim.width, dim.height)
+  override def paintComponent(g: Graphics): Unit = {
+    super.paintComponent(g)
     scale()
-
     // draw cells
     model.getData.toList.foreach {
       a =>

@@ -1,4 +1,4 @@
-package ru.exante.ant.behavior
+package ru.exante.ant.model
 
 sealed trait Direction {
   val left: Direction

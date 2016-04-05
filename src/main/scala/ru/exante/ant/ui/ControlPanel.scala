@@ -5,15 +5,16 @@ import java.awt.{Color, Insets, GridBagConstraints, GridBagLayout}
 import javax.swing._
 import javax.swing.event.{ChangeEvent, ChangeListener}
 
+import ru.exante.ant.ui.api.ControlPanelListener
 
-class ControlPanel extends JPanel(new GridBagLayout) {
 
+class ControlPanel(val listener: ControlPanelListener) extends JPanel(new GridBagLayout) {
+
+  private var transitionPanels = List[TransitionPanel]()
   private val startBtn = new JToggleButton("start")
   private val addBtn = new JButton("+")
   private val dataPanel = new JPanel(new GridBagLayout)
   private val buttonPanel = new JPanel(new GridBagLayout)
-
-  setBorder(BorderFactory.createEtchedBorder(Color.RED, Color.WHITE))
 
   private val panelGbc = new GridBagConstraints
   panelGbc.fill = GridBagConstraints.BOTH
@@ -41,49 +42,38 @@ class ControlPanel extends JPanel(new GridBagLayout) {
   addBtn.addActionListener(eventshandler)
   startBtn.addActionListener(eventshandler)
 
+  startBtn.setEnabled(false)
+
   private def addRow() = {
-    val panel = new JPanel(new GridBagLayout)
-    
-    val group = new ButtonGroup
-    val left = new JRadioButton("Left", true)
-    val right = new JRadioButton("Right")
-    group.add(left)
-    group.add(right)
-    panel.add(left, commonGbc)
-    panel.add(right, commonGbc)
+    val panel = new TransitionPanel()
 
-    val delBtn = new JButton("-")
-    val delGbc = new GridBagConstraints()
-    delGbc.anchor = GridBagConstraints.WEST
-    delGbc.insets = new Insets(5, 10, 5, 0)
-    delGbc.gridwidth = GridBagConstraints.REMAINDER
-    panel.add(delBtn, delGbc)
-
-    val colorChooser = new JTextField
-    colorChooser.setColumns(10)
-    panel.add(colorChooser, commonGbc)
+    transitionPanels = panel :: transitionPanels
 
     val gbc = new GridBagConstraints
     gbc.fill = GridBagConstraints.HORIZONTAL
     gbc.anchor = GridBagConstraints.NORTHWEST
     gbc.gridwidth = GridBagConstraints.REMAINDER
     dataPanel.add(panel, gbc)
+    startBtn.setEnabled(true)
+    revalidate()
+    repaint()
   }
   
-  private[ControlPanel] class EventsHandler extends ActionListener with ChangeListener {
+  private[ControlPanel] class EventsHandler extends ActionListener {
     
     override def actionPerformed(e: ActionEvent): Unit = {
       if (e.getSource == startBtn) {
-        addRow()
-        println(e.getSource.asInstanceOf[JToggleButton].isSelected)
+        if (startBtn.isSelected) {
+          listener.onStart(transitionPanels.reverse.map {
+            t => (t.getDirection, t.getColor)
+          })
+        } else {
+          listener.onStop
+        }
       } else if (e.getSource == addBtn) {
-        println(e)
+        addRow()
       }
     }
 
-    override def stateChanged(e: ChangeEvent): Unit = {
-      val selected = e.getSource.asInstanceOf[JToggleButton].isSelected
-      println(e)
-    }
   }
 }

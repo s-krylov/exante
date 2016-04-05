@@ -3,20 +3,20 @@ package ru.exante.ant.actor
 import javax.swing.SwingUtilities
 
 import akka.actor.Actor
-import ru.exante.ant.behavior.{Left, Right}
-import ru.exante.ant.model.Ant
-import ru.exante.ant.ui.CellInfoStore
+import ru.exante.ant.model._
+import ru.exante.ant.ui.api.CellInfoStore
 
 
 class TransitionActor(private val cellInfoStore: CellInfoStore) extends Actor {
 
-//  val directions = Array(Left(), Right())
-  val directions = Array(Right(), Left(), Right(), Left(), Left())
+  var directions: Array[Direction] = _
+//  val directions = Array(Right(), Left(), Right(), Left(), Left())
 
   private val ant = new Ant(this)
 
   override def receive: Receive = {
     case MakeNextStep() => launch()
+    case SetDirections(list) => directions = list.toArray[Direction]
   }
 
   private def launch(): Unit = {
@@ -34,3 +34,4 @@ class TransitionActor(private val cellInfoStore: CellInfoStore) extends Actor {
 }
 
 case class MakeNextStep()
+case class SetDirections(list: List[Direction])

@@ -1,10 +1,13 @@
 package ru.exante.ant.ui
 
-import java.awt.{GridBagConstraints, GridBagLayout, Toolkit, Dimension}
-import akka.actor.{Props, ActorSystem}
+import java.awt._
+import akka.actor.{Cancellable, Props, ActorSystem}
+import collection.immutable.List
+import ru.exante.ant.model.Direction
+import ru.exante.ant.ui.api.ControlPanelListener
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import ru.exante.ant.actor.{MakeNextStep, TransitionActor}
+import ru.exante.ant.actor.{SetDirections, MakeNextStep, TransitionActor}
 import javax.swing.{WindowConstants, JFrame, SwingUtilities}
 
 
@@ -26,17 +29,28 @@ object Main {
         lPanelGbc.weighty = 1
         frame.add(lPanel, lPanelGbc)
 
-//        val rPanel = new ControlPanel
-//        rPanel.setPreferredSize(new Dimension(300, 400))
-//        rPanel.setMinimumSize(new Dimension(300, 400))
-//        val rPanelGbc = new GridBagConstraints()
-//        rPanelGbc.fill = GridBagConstraints.BOTH
-//        rPanelGbc.weighty = 1
-//        frame.add(rPanel, rPanelGbc)
-
         val systemActor = ActorSystem("Langthon-ant-system")
         val transitionsActor = systemActor.actorOf(Props(new TransitionActor(lPanel)), "transitions-actor")
-        systemActor.scheduler.schedule(0 seconds, 200 milliseconds, transitionsActor, MakeNextStep())
+        val rPanel = new ControlPanel(new ControlPanelListener {
+          var task: Cancellable = _
+
+          override def onStart(data: List[(Direction, Color)]): Unit = {
+            val (directions, colors) = data.unzip
+            lPanel.colors = colors.toArray[Color]
+            transitionsActor ! SetDirections(directions)
+            task = systemActor.scheduler.schedule(0 seconds, 200 milliseconds, transitionsActor, MakeNextStep())
+          }
+
+          override def onStop: Unit = {
+            task.cancel()
+          }
+        })
+        rPanel.setPreferredSize(new Dimension(300, 400))
+        rPanel.setMinimumSize(new Dimension(300, 400))
+        val rPanelGbc = new GridBagConstraints()
+        rPanelGbc.fill = GridBagConstraints.BOTH
+        rPanelGbc.weighty = 1
+        frame.add(rPanel, rPanelGbc)
 
         val screen = Toolkit.getDefaultToolkit.getScreenSize
         frame.setBounds((screen.width - 500) / 2,(screen.height - 400) / 2, (screen.width + 500) / 2,(screen.height + 400) / 2)

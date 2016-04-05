@@ -1,7 +1,6 @@
 package ru.exante.ant.model
 
 import ru.exante.ant.actor.TransitionActor
-import ru.exante.ant.behavior._
 
 /**
  * @author krylov

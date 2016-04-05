@@ -1,4 +1,4 @@
-package ru.exante.ant.ui
+package ru.exante.ant.ui.api
 
 import ru.exante.ant.model.Cell2
 
